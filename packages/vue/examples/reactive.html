@@ -14,6 +14,8 @@
       name: '云牧'
     })
 
-    console.log(obj)
+    console.log(obj.name) // 此处应该触发 track
+
+    obj.name = '黛玉' // 此处应该触发 trigger
   </script>
 </html>
