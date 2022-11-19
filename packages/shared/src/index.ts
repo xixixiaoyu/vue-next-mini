@@ -1,2 +1,2 @@
-// 判断数组
+// 判断是否数组
 export const isArray = Array.isArray

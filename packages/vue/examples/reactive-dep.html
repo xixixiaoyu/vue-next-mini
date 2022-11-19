@@ -7,18 +7,29 @@
     <title>Document</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="p1"></div>
+      <div class="p2"></div>
+    </div>
+    <img
+      width="1000"
+      src="https://tvax1.sinaimg.cn/large/007c1Ltfgy1h8a9kx3l09j31020jwtd6.jpg"
+    />
+
     <script src="../dist/vue.js"></script>
     <script>
       const { reactive, effect } = Vue
 
       const obj = reactive({
-        name: '黛玉',
-        age: 18
+        name: '黛玉'
       })
 
       effect(() => {
-        document.getElementById('app').innerText = obj.name
+        document.querySelector('.p1').innerText = obj.name
+      })
+
+      effect(() => {
+        document.querySelector('.p2').innerText = obj.name
       })
 
       setTimeout(() => {

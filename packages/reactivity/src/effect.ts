@@ -1,3 +1,6 @@
+import type { Dep } from './dep'
+import { createDep } from './dep'
+import { isArray } from '@vue/shared'
 /**
  * effect 函数
  * @param fn 执行方法
@@ -24,7 +27,7 @@ export class ReactiveEffect<T = any> {
   }
 }
 
-type KeyToDepMap = Map<any, ReactiveEffect>
+type KeyToDepMap = Map<any, Dep>
 /**
  * 收集所有依赖的 WeakMap 实例：
  * 1. `key`：响应性对象
@@ -51,10 +54,25 @@ export function track(target: object, key: unknown) {
   if (!depsMap) {
     targetMap.set(target, (depsMap = new Map()))
   }
-  // 设置访问的key和activeEffect实例映射关系
-  depsMap.set(key, activeEffect)
+
+  // 获取指定key的dep
+  let dep = depsMap.get(key)
+  // 设置访问的key和依赖set的映射关系
+  if (!dep) {
+    depsMap.set(key, (dep = createDep()))
+  }
+  // 收集依赖
+  trackEffect(dep)
 
   console.log('targetMap', targetMap)
+}
+
+/**
+ * 利用 dep 依次跟踪指定 key 的所有 effect
+ * @param dep
+ */
+export function trackEffect(dep: Dep) {
+  dep.add(activeEffect!)
 }
 
 /**
@@ -70,11 +88,32 @@ export function trigger(target: object, key?: unknown, newValue?: unknown) {
   if (!depsMap) {
     return
   }
-  // 根据设置的key取到对象，该对象是一个ReactiveEffect实例
-  const effect = depsMap.get(key) as ReactiveEffect
-  if (!effect) {
+
+  // 根据设置的key获取Set依赖
+  const dep: Dep | undefined = depsMap.get(key)
+  if (!dep) {
     return
   }
-  // 执行传入实例的fn方法
-  effect.fn()
+
+  // 遍历触发依赖Set里对象的run方法
+  triggerEffects(dep)
+}
+
+/**
+ * 依次触发Set中保存的依赖
+ */
+export function triggerEffects(dep: Dep) {
+  // 转换数组
+  const effects = isArray(dep) ? dep : [...dep]
+  // 依次触发
+  for (const effect of effects) {
+    triggerEffect(effect)
+  }
+}
+
+/**
+ * 触发指定的依赖
+ */
+export function triggerEffect(effect: ReactiveEffect) {
+  effect.run()
 }
