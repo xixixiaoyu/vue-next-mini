@@ -65,5 +65,16 @@ export function track(target: object, key: unknown) {
  * @param oldValue 指定 key 的旧值
  */
 export function trigger(target: object, key?: unknown, newValue?: unknown) {
-  console.log('trigger: 触发依赖')
+  // 根据new Proxy传入对象从targetMap取值
+  const depsMap = targetMap.get(target)
+  if (!depsMap) {
+    return
+  }
+  // 根据设置的key取到对象，该对象是一个ReactiveEffect实例
+  const effect = depsMap.get(key) as ReactiveEffect
+  if (!effect) {
+    return
+  }
+  // 执行传入实例的fn方法
+  effect.fn()
 }
