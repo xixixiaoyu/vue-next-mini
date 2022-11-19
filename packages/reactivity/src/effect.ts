@@ -62,7 +62,7 @@ export function track(target: object, key: unknown) {
     depsMap.set(key, (dep = createDep()))
   }
   // 收集依赖
-  trackEffect(dep)
+  trackEffects(dep)
 
   console.log('targetMap', targetMap)
 }
@@ -71,7 +71,7 @@ export function track(target: object, key: unknown) {
  * 利用 dep 依次跟踪指定 key 的所有 effect
  * @param dep
  */
-export function trackEffect(dep: Dep) {
+export function trackEffects(dep: Dep) {
   dep.add(activeEffect!)
 }
 

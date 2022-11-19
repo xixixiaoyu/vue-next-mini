@@ -8,21 +8,20 @@
   </head>
   <body>
     <div id="app"></div>
-    <script src="../dist/vue.js"></script>
+    <script src="../../dist/vue.js"></script>
     <script>
-      const { reactive, effect } = Vue
+      const { ref, effect } = Vue
 
-      const obj = reactive({
-        name: '黛玉',
-        age: 18
+      const obj = ref({
+        name: '黛玉'
       })
 
       effect(() => {
-        document.getElementById('app').innerText = obj.name
+        document.getElementById('app').innerText = obj.value.name
       })
 
       setTimeout(() => {
-        obj.name = '云牧'
+        obj.value.name = '云牧'
       }, 2000)
     </script>
   </body>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <div class="p1"></div>
+      <div class="p2"></div>
+    </div>
+    <img
+      width="1000"
+      src="https://tvax1.sinaimg.cn/large/007c1Ltfgy1h8a9kx3l09j31020jwtd6.jpg"
+    />
+
+    <script src="../../dist/vue.js"></script>
+    <script>
+      const { reactive, effect } = Vue
+
+      const obj = reactive({
+        name: '黛玉'
+      })
+
+      effect(() => {
+        document.querySelector('.p1').innerText = obj.name
+      })
+
+      effect(() => {
+        document.querySelector('.p2').innerText = obj.name
+      })
+
+      setTimeout(() => {
+        obj.name = '云牧'
+      }, 2000)
+    </script>
+  </body>
+</html>
