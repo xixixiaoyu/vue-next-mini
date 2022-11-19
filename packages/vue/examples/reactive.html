@@ -6,16 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
+  <div id="app"></div>
   <script src="../dist/vue.js"></script>
   <script>
-    const { reactive } = Vue
+    const { reactive, effect } = Vue
 
     const obj = reactive({
-      name: '云牧'
+      name: '黛玉'
     })
 
-    console.log(obj.name) // 此处应该触发 track
-
-    obj.name = '黛玉' // 此处应该触发 trigger
+    effect(() => {
+      document.getElementById('app').innerText = obj.name
+    })
   </script>
 </html>
