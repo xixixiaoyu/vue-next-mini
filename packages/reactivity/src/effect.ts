@@ -1,6 +1,7 @@
 import type { Dep } from './dep'
 import { createDep } from './dep'
 import { isArray } from '@vue/shared'
+import { ComputedRefImpl } from './computed'
 /**
  * effect 函数
  * @param fn 执行方法
@@ -18,6 +19,8 @@ export let activeEffect: ReactiveEffect | undefined
 
 // 响应性触发依赖时的执行类
 export class ReactiveEffect<T = any> {
+  computed?: ComputedRefImpl<T>
+
   constructor(public fn: () => T) {}
   run() {
     // activeEffect赋值当前实例

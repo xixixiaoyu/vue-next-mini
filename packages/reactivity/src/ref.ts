@@ -63,14 +63,14 @@ function isRef(r: any): r is Ref {
 }
 
 // 为 ref 的 value 进行依赖收集工作
-function trackRefValue(ref) {
+export function trackRefValue(ref) {
   if (activeEffect) {
     trackEffects(ref.dep || (ref.dep = createDep()))
   }
 }
 
 //  为 ref 的 value 进行触发依赖工作
-function triggerRefValue(ref) {
+export function triggerRefValue(ref) {
   if (ref.dep) {
     triggerEffects(ref.dep)
   }
