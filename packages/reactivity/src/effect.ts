@@ -27,6 +27,7 @@ export class ReactiveEffect<T = any> {
     public fn: () => T,
     public scheduler: EffectScheduler | null = null
   ) {}
+
   run() {
     // activeEffect赋值当前实例
     activeEffect = this
@@ -72,7 +73,7 @@ export function track(target: object, key: unknown) {
   // 收集依赖
   trackEffects(dep)
 
-  console.log('targetMap', targetMap)
+  // console.log('targetMap', targetMap)
 }
 
 /**
@@ -113,9 +114,17 @@ export function trigger(target: object, key?: unknown, newValue?: unknown) {
 export function triggerEffects(dep: Dep) {
   // 转换数组
   const effects = isArray(dep) ? dep : [...dep]
-  // 依次触发
+  // 先触发所有计算属性依赖
   for (const effect of effects) {
-    triggerEffect(effect)
+    if (effect.computed) {
+      triggerEffect(effect)
+    }
+  }
+  // 再触发所有非计算属性依赖
+  for (const effect of effects) {
+    if (!effect.computed) {
+      triggerEffect(effect)
+    }
   }
 }
 

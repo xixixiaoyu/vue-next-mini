@@ -45,7 +45,8 @@ export class ComputedRefImpl<T> {
 export function computed(getterOrOptions) {
   let getter
   // 判断是函数就赋值getter
-  if (isFunction(getterOrOptions)) {
+  const onlyGetter = isFunction(getterOrOptions)
+  if (onlyGetter) {
     getter = getterOrOptions
   }
 
