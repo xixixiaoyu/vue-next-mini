@@ -1,23 +1,39 @@
 import type { Dep } from './dep'
 import { createDep } from './dep'
-import { isArray } from '@vue/shared'
+import { isArray, extend } from '@vue/shared'
 import { ComputedRefImpl } from './computed'
+
+export type EffectScheduler = (...args: any[]) => any
+type KeyToDepMap = Map<any, Dep>
+const targetMap = new WeakMap<any, KeyToDepMap>()
+
+export interface ReactiveEffectOptions {
+  lazy?: boolean
+  scheduler?: EffectScheduler
+}
+
 /**
  * effect 函数
  * @param fn 执行方法
  * @returns 以 ReactiveEffect 实例为 this 的 fn 执行函数
  */
-export function effect<T = any>(fn: () => T) {
+export function effect<T = any>(fn: () => T, options?: ReactiveEffectOptions) {
   // 生成ReactiveEffect实例
   const _effect = new ReactiveEffect(fn)
-  // 执行实例run方法
-  _effect.run()
+
+  if (options) {
+    extend(_effect, options)
+  }
+
+  if (!options || !options.lazy) {
+    // 执行实例run方法
+    _effect.run()
+  }
 }
 
 // 单例的，当前的 effect
 export let activeEffect: ReactiveEffect | undefined
 
-export type EffectScheduler = (...args: any[]) => any
 // 响应性触发依赖时的执行类
 export class ReactiveEffect<T = any> {
   // 存在该属性则表示当前effect为计算属性的effect
@@ -36,7 +52,6 @@ export class ReactiveEffect<T = any> {
   }
 }
 
-type KeyToDepMap = Map<any, Dep>
 /**
  * 收集所有依赖的 WeakMap 实例：
  * 1. `key`：响应性对象
@@ -44,7 +59,6 @@ type KeyToDepMap = Map<any, Dep>
  * 		1. `key`：响应性对象的指定属性
  * 		2. `value`：指定对象的指定属性的 执行函数
  */
-const targetMap = new WeakMap<any, KeyToDepMap>()
 
 /**
  * 用于收集依赖的方法

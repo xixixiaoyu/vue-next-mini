@@ -12,3 +12,6 @@ export const hasChanged = (value: any, oldValue: any) =>
 // 判断是否函数
 export const isFunction = (val: unknown): val is Function =>
   typeof val === 'function'
+
+// 对象合并
+export const extend = Object.assign
