@@ -2,6 +2,7 @@ import { EMPTY_OBJ, hasChanged } from '@vue/shared'
 import { ReactiveEffect } from 'packages/reactivity/src/effect'
 import { isReactive } from 'packages/reactivity/src/reactive'
 import { queuePreFlushCb } from './scheduler'
+import { isObject } from '@vue/shared'
 
 /**
  * watch 配置项属性
@@ -19,7 +20,7 @@ export interface WatchOptions<Immediate = boolean> {
  * @returns
  */
 export function watch(source, cb: Function, options?: WatchOptions) {
-  return doWatch(source as any, cb, options)
+  return doWatch(source, cb, options)
 }
 
 function doWatch(
@@ -30,7 +31,7 @@ function doWatch(
   // 触发 getter 的指定函数
   let getter: () => any
 
-  // 判断 source 的数据类型
+  // 判断source是否响应式
   if (isReactive(source)) {
     // 指定 getter
     getter = () => source
@@ -42,17 +43,15 @@ function doWatch(
 
   // 存在回调函数和deep
   if (cb && deep) {
-    // TODO
     const baseGetter = getter
-    getter = () => baseGetter()
+    getter = () => traverse(baseGetter())
   }
 
   // 旧值
   let oldValue = {}
-  // job 执行方法
+
   const job = () => {
     if (cb) {
-      // watch(source, cb)
       const newValue = effect.run()
       if (deep || hasChanged(newValue, oldValue)) {
         cb(newValue, oldValue)
@@ -79,4 +78,17 @@ function doWatch(
   return () => {
     effect.stop()
   }
+}
+
+// 依次执行getter，进行依赖收集
+export function traverse(value: unknown) {
+  if (!isObject(value)) {
+    return value
+  }
+
+  for (const key in value as Object) {
+    traverse((value as any)[key])
+  }
+
+  return value
 }
