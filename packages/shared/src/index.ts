@@ -15,3 +15,6 @@ export const isFunction = (val: unknown): val is Function =>
 
 // 对象合并
 export const extend = Object.assign
+
+// 只读空对象
+export const EMPTY_OBJ: { readonly [key: string]: any } = {}

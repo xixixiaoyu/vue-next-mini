@@ -50,6 +50,8 @@ export class ReactiveEffect<T = any> {
     // 执行effect传入函数
     return this.fn()
   }
+
+  stop() {}
 }
 
 /**
