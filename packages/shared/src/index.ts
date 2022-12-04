@@ -18,3 +18,8 @@ export const extend = Object.assign
 
 // 只读空对象
 export const EMPTY_OBJ: { readonly [key: string]: any } = {}
+
+// 判断String
+export function isString(value): value is string {
+  return typeof value === 'string'
+}
