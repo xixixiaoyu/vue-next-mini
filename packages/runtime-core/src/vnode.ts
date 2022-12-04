@@ -20,7 +20,7 @@ export function isVNode(value: any): value is VNode {
  * @param children 子节点
  * @returns vnode 对象
  */
-export function createVNode(type, props, children): VNode {
+export function createVNode(type, props, children?): VNode {
   // 通过 bit 位处理 shapeFlag 类型
   const shapeFlag = isString(type) ? ShapeFlags.ELEMENT : 0
 
@@ -49,7 +49,7 @@ export function normalizeChildren(vnode: VNode, children: unknown) {
   if (children == null) {
     children = null
   } else if (isArray(children)) {
-    // TODO: array
+    type = ShapeFlags.ARRAY_CHILDREN
   } else if (typeof children === 'object') {
     // TODO: object
   } else if (isFunction(children)) {

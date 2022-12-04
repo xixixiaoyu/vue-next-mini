@@ -8,21 +8,19 @@ export function h(type: any, propsOrChildren?: any, children?: any): VNode {
   if (l === 2) {
     // 如果 第二个参数是对象，但不是数组。则第二个参数只有两种可能性：1. VNode 2.普通的 props
     if (isObject(propsOrChildren) && !isArray(propsOrChildren)) {
-      // 如果是 VNode，则 第二个参数代表了 children
+      // 如果是VNode，则 第二个参数代表了children
       if (isVNode(propsOrChildren)) {
         return createVNode(type, null, [propsOrChildren])
       }
-      // 如果不是 VNode， 则第二个参数代表了 props
+      // 如果不是VNode， 则第二个参数代表了props
       return createVNode(type, propsOrChildren)
-    }
-    // 如果第二个参数不是单纯的 object，则 第二个参数代表了 props
-    else {
+    } else {
       return createVNode(type, null, propsOrChildren)
     }
   }
   // 如果用户传递了三个或以上的参数，那么证明第二个参数一定代表了props
   else {
-    // 如果参数在三个以上，则从第二个参数开始，把后续所有参数都作为 children
+    // 如果参数在三个以上，则从第二个参数开始，把后续所有参数都作为children
     if (l > 3) {
       children = Array.prototype.slice.call(arguments, 2)
     }
