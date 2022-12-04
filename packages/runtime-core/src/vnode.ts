@@ -1,4 +1,5 @@
 import { isArray, isFunction, isObject, isString } from '@vue/shared'
+import { normalizeClass } from 'packages/shared/src/normalizeProp'
 import { ShapeFlags } from 'packages/shared/src/shapeFlag'
 
 export const Fragment = Symbol('Fragment')
@@ -25,6 +26,14 @@ export function isVNode(value: any): value is VNode {
  * @returns vnode 对象
  */
 export function createVNode(type, props, children?): VNode {
+  if (props) {
+    // 处理 class
+    let { class: klass, style } = props
+    if (klass && !isString(klass)) {
+      props.class = normalizeClass(klass)
+    }
+  }
+
   // 通过 bit 位处理 shapeFlag 类型
   const shapeFlag = isString(type)
     ? ShapeFlags.ELEMENT
