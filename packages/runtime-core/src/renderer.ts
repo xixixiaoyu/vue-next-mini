@@ -46,6 +46,46 @@ function baseCreateRenderer(options: RendererOptions): any {
     setElementText: hostSetElementText
   } = options
 
+  /**
+   * Element 的打补丁操作
+   */
+  const processElement = (oldVNode, newVNode, container, anchor) => {
+    if (oldVNode == null) {
+      // 挂载操作
+      mountElement(newVNode, container, anchor)
+    } else {
+      // TODO: 更新操作
+    }
+  }
+
+  /**
+   * element 的挂载操作
+   */
+  const mountElement = (vnode, container, anchor) => {
+    const { type, props, shapeFlag } = vnode
+
+    // 创建 element
+    const el = (vnode.el = hostCreateElement(type))
+
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      // 设置 文本子节点
+      hostSetElementText(el, vnode.children as string)
+    } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+      // TODO: 设置 Array 子节点
+    }
+
+    // 处理 props
+    if (props) {
+      // 遍历 props 对象
+      for (const key in props) {
+        hostPatchProp(el, key, null, props[key])
+      }
+    }
+
+    // 插入 el 到指定的位置
+    hostInsert(el, container, anchor)
+  }
+
   const patch = (oldVNode, newVNode, container, anchor = null) => {
     if (oldVNode === newVNode) {
       return
@@ -64,7 +104,7 @@ function baseCreateRenderer(options: RendererOptions): any {
         break
       default:
         if (shapeFlag & ShapeFlags.ELEMENT) {
-          // TODO: Element
+          processElement(oldVNode, newVNode, container, anchor)
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
           // TODO: 组件
         }
