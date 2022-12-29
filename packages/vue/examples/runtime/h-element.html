@@ -11,7 +11,7 @@
 
     <script src="../../dist/vue.js"></script>
     <script>
-      const { h } = Vue
+      const { h, render } = Vue
 
       const vnode = h(
         'div',
@@ -21,7 +21,7 @@
         'hello render'
       )
 
-      console.log(vnode)
+      render(vnode, document.querySelector('#app'))
     </script>
   </body>
 </html>
