@@ -23,3 +23,9 @@ export const EMPTY_OBJ: { readonly [key: string]: any } = {}
 export function isString(value): value is string {
   return typeof value === 'string'
 }
+
+/**
+ * 是否 on 开头
+ */
+const onRE = /^on[^a-z]/
+export const isOn = (key: string) => onRE.test(key)
