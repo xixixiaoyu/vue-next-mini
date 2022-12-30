@@ -1,5 +1,5 @@
 import { ShapeFlags } from 'packages/shared/src/shapeFlag'
-import { Fragment } from './vnode'
+import { Fragment, isSameVNodeType } from './vnode'
 import { EMPTY_OBJ } from '@vue/shared'
 
 /**
@@ -22,6 +22,10 @@ export interface RendererOptions {
    * 创建指定的 Element
    */
   createElement(type: string)
+  /**
+   * 卸载指定dom
+   */
+  remove(el): void
 }
 
 /**
@@ -44,7 +48,8 @@ function baseCreateRenderer(options: RendererOptions): any {
     insert: hostInsert,
     patchProp: hostPatchProp,
     createElement: hostCreateElement,
-    setElementText: hostSetElementText
+    setElementText: hostSetElementText,
+    remove: hostRemove
   } = options
 
   /**
@@ -187,6 +192,14 @@ function baseCreateRenderer(options: RendererOptions): any {
       return
     }
 
+    /**
+     * 判断是否为相同类型节点
+     */
+    if (oldVNode && !isSameVNodeType(oldVNode, newVNode)) {
+      unmount(oldVNode)
+      oldVNode = null
+    }
+
     const { type, shapeFlag } = newVNode
     switch (type) {
       case Text:
@@ -205,6 +218,10 @@ function baseCreateRenderer(options: RendererOptions): any {
           // TODO: 组件
         }
     }
+  }
+
+  const unmount = vnode => {
+    hostRemove(vnode.el!)
   }
 
   /**
