@@ -26,6 +26,14 @@ export interface RendererOptions {
    * 卸载指定dom
    */
   remove(el): void
+  /**
+   * 创建 Text 节点
+   */
+  createText(text: string)
+  /**
+   * 设置 text
+   */
+  setText(node, text): void
 }
 
 /**
@@ -49,8 +57,30 @@ function baseCreateRenderer(options: RendererOptions): any {
     patchProp: hostPatchProp,
     createElement: hostCreateElement,
     setElementText: hostSetElementText,
-    remove: hostRemove
+    remove: hostRemove,
+    createText: hostCreateText,
+    setText: hostSetText
   } = options
+
+  /**
+   * Text 的打补丁操作
+   */
+  const processText = (oldVNode, newVNode, container, anchor) => {
+    // 不存在旧的节点，则为 挂载 操作
+    if (oldVNode == null) {
+      // 生成节点
+      newVNode.el = hostCreateText(newVNode.children as string)
+      // 挂载
+      hostInsert(newVNode.el, container, anchor)
+    }
+    // 存在旧的节点，则为 更新 操作
+    else {
+      const el = (newVNode.el = oldVNode.el!)
+      if (newVNode.children !== oldVNode.children) {
+        hostSetText(el, newVNode.children as string)
+      }
+    }
+  }
 
   /**
    * Element 的打补丁操作
@@ -203,7 +233,7 @@ function baseCreateRenderer(options: RendererOptions): any {
     const { type, shapeFlag } = newVNode
     switch (type) {
       case Text:
-        // TODO: Text
+        processText(oldVNode, newVNode, container, anchor)
         break
       case Comment:
         // TODO: Comment
