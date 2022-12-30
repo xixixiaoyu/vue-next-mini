@@ -1,6 +1,7 @@
 import { ShapeFlags } from 'packages/shared/src/shapeFlag'
 import { Fragment, isSameVNodeType } from './vnode'
-import { EMPTY_OBJ } from '@vue/shared'
+import { EMPTY_OBJ, isString } from '@vue/shared'
+import { normalizeVNode } from './componentRenderUtils'
 
 /**
  * 渲染器配置对象
@@ -66,6 +67,17 @@ function baseCreateRenderer(options: RendererOptions): any {
     setText: hostSetText,
     createComment: hostCreateComment
   } = options
+
+  /**
+   * Fragment 的打补丁操作
+   */
+  const processFragment = (oldVNode, newVNode, container, anchor) => {
+    if (oldVNode == null) {
+      mountChildren(newVNode.children, container, anchor)
+    } else {
+      patchChildren(oldVNode, newVNode, container, anchor)
+    }
+  }
 
   /**
    * Comment 的打补丁操作
@@ -159,6 +171,20 @@ function baseCreateRenderer(options: RendererOptions): any {
 
     // 更新 props
     patchProps(el, newVNode, oldProps, newProps)
+  }
+
+  /**
+   * 挂载子节点
+   */
+  const mountChildren = (children, container, anchor) => {
+    // 处理 Cannot assign to read only property '0' of string 'xxx'
+    if (isString(children)) {
+      children = children.split('')
+    }
+    for (let i = 0; i < children.length; i++) {
+      const child = (children[i] = normalizeVNode(children[i]))
+      patch(null, child, container, anchor)
+    }
   }
 
   /**
@@ -259,7 +285,7 @@ function baseCreateRenderer(options: RendererOptions): any {
         processCommentNode(oldVNode, newVNode, container, anchor)
         break
       case Fragment:
-        // TODO: Fragment
+        processFragment(oldVNode, newVNode, container, anchor)
         break
       default:
         if (shapeFlag & ShapeFlags.ELEMENT) {
