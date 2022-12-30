@@ -34,6 +34,10 @@ export interface RendererOptions {
    * 设置 text
    */
   setText(node, text): void
+  /**
+   * 设置 text
+   */
+  createComment(text: string)
 }
 
 /**
@@ -59,8 +63,24 @@ function baseCreateRenderer(options: RendererOptions): any {
     setElementText: hostSetElementText,
     remove: hostRemove,
     createText: hostCreateText,
-    setText: hostSetText
+    setText: hostSetText,
+    createComment: hostCreateComment
   } = options
+
+  /**
+   * Comment 的打补丁操作
+   */
+  const processCommentNode = (oldVNode, newVNode, container, anchor) => {
+    if (oldVNode == null) {
+      // 生成节点
+      newVNode.el = hostCreateComment((newVNode.children as string) || '')
+      // 挂载
+      hostInsert(newVNode.el, container, anchor)
+    } else {
+      // 无更新
+      newVNode.el = oldVNode.el
+    }
+  }
 
   /**
    * Text 的打补丁操作
@@ -236,7 +256,7 @@ function baseCreateRenderer(options: RendererOptions): any {
         processText(oldVNode, newVNode, container, anchor)
         break
       case Comment:
-        // TODO: Comment
+        processCommentNode(oldVNode, newVNode, container, anchor)
         break
       case Fragment:
         // TODO: Fragment
